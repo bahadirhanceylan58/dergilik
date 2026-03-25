@@ -26,6 +26,7 @@
   <!-- TOP MENUBAR -->
   <header id="menubar">
     <div class="menu-left">
+      <button class="mobile-btn" id="btn-mobile-menu" title="Menü">☰</button>
       <div class="app-logo">
         <span class="logo-icon">📰</span>
         <span class="logo-text">Dergi <strong>Stüdyosu</strong></span>
@@ -69,6 +70,7 @@
       <span id="doc-title-display" class="doc-title" contenteditable="true" spellcheck="false">Yeni Dergi</span>
     </div>
     <div class="menu-right">
+      <button class="mobile-btn" id="btn-mobile-pages" title="Sayfalar">▤</button>
       <span id="format-badge" class="format-badge">A3</span>
       <div class="zoom-control">
         <button id="btn-zoom-out" title="Uzaklaştır">−</button>
@@ -78,6 +80,7 @@
       <button id="btn-grid" class="icon-btn" title="Kılavuz Izgarası">⬛</button>
       <button id="btn-undo" class="icon-btn" title="Geri Al (Ctrl+Z)">↩</button>
       <button id="btn-redo" class="icon-btn" title="Yinele (Ctrl+Y)">↪</button>
+      <button class="mobile-btn" id="btn-mobile-props" title="Özellikler">⚙</button>
     </div>
   </header>
 
@@ -129,7 +132,10 @@
 
   <!-- PROPERTIES PANEL RIGHT -->
   <aside id="properties-panel">
-    <div class="panel-header">Özellikler</div>
+    <div class="panel-header">
+      Özellikler
+      <button id="btn-close-props" class="mobile-btn" title="Kapat" style="display:none">✕</button>
+    </div>
 
     <!-- Select / Position -->
     <div class="prop-section" id="prop-position">
@@ -272,6 +278,28 @@
 
   <!-- IMAGE UPLOAD (hidden) -->
   <input type="file" id="image-upload" accept="image/*" style="display:none"/>
+
+  <!-- MOBİL OVERLAY -->
+  <div id="mobile-overlay"></div>
+
+  <!-- MOBİL HAMBURGER MENÜ PANELİ -->
+  <div id="mobile-menu-panel">
+    <button onclick="newDocument(); closeAllMobilePanels()">🆕 Yeni Belge</button>
+    <button onclick="saveToStorage(); showToast('💾 Kaydedildi.', 'success'); closeAllMobilePanels()">💾 Kaydet</button>
+    <button onclick="saveToFile(); closeAllMobilePanels()">📥 JSON Olarak İndir</button>
+    <button onclick="document.getElementById('json-upload').click(); closeAllMobilePanels()">📂 JSON Yükle</button>
+    <div class="mob-divider"></div>
+    <button onclick="exportA4PDF(); closeAllMobilePanels()">📄 A4 PDF İndir</button>
+    <button onclick="exportA3Booklet(); closeAllMobilePanels()">🖨️ A3 Kitapçık PDF</button>
+    <button onclick="exportA3SinglePages(); closeAllMobilePanels()">📋 A3 Tek Sayfa PDF</button>
+    <div class="mob-divider"></div>
+    <button onclick="loadTemplate('cover'); closeAllMobilePanels()">📕 Kapak Şablonu</button>
+    <button onclick="loadTemplate('article'); closeAllMobilePanels()">📰 İçerik Şablonu</button>
+    <button onclick="loadTemplate('photo'); closeAllMobilePanels()">📸 Fotoğraf Portfolyo</button>
+    <div class="mob-divider"></div>
+    <button onclick="setPageFormat('A4'); closeAllMobilePanels()">📄 Format: A4</button>
+    <button onclick="setPageFormat('A3'); closeAllMobilePanels()">📋 Format: A3</button>
+  </div>
 
   <!-- LOADING OVERLAY -->
   <div id="loading-overlay" style="display:none">

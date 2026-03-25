@@ -466,3 +466,165 @@ html, body {
 #canvas-area::-webkit-scrollbar { width: 8px; height: 8px; }
 #canvas-area::-webkit-scrollbar-track { background: var(--bg-deep); }
 #canvas-area::-webkit-scrollbar-thumb { background: #2a2a3d; border-radius: 999px; }
+
+/* ================================================
+   MOBİL UYUMLULUK — Android / iOS
+   ================================================ */
+
+/* Mobil toggle düğmeleri (masaüstünde gizli) */
+.mobile-btn {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 34px; height: 34px; min-width: 34px;
+  background: transparent; border: none;
+  color: var(--text-secondary); font-size: 18px;
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: .15s; flex-shrink: 0;
+}
+.mobile-btn:hover, .mobile-btn.active {
+  background: var(--bg-hover); color: var(--text-primary);
+}
+
+/* Arka plan karartma */
+#mobile-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 180;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+#mobile-overlay.active { display: block; }
+
+/* Hamburger menü paneli */
+#mobile-menu-panel {
+  display: none;
+  position: fixed;
+  top: var(--menubar-h); left: 0; right: 0;
+  background: var(--bg-panel2);
+  border-bottom: 1px solid var(--border);
+  z-index: 210;
+  padding: 6px 0;
+  box-shadow: var(--shadow-lg);
+  animation: fadeDown .15s ease;
+  max-height: calc(100vh - var(--menubar-h));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#mobile-menu-panel.open { display: block; }
+#mobile-menu-panel button {
+  display: block; width: 100%;
+  text-align: left; padding: 14px 20px;
+  background: transparent; border: none;
+  color: var(--text-primary); font-family: var(--font-ui); font-size: 14px;
+  cursor: pointer; transition: background .1s;
+}
+#mobile-menu-panel button:active { background: var(--bg-hover); }
+.mob-divider { height: 1px; background: var(--border); margin: 4px 12px; }
+
+/* ---- MOBİL LAYOUT (≤ 768px) ---- */
+@media (max-width: 768px) {
+
+  /* Mobil düğmeleri göster */
+  .mobile-btn { display: flex; }
+  /* Masaüstü navigasyonu gizle */
+  .menu-nav { display: none; }
+  .app-logo { display: none; }
+  .format-badge { display: none; }
+
+  /* Menubar */
+  #menubar { padding: 0 6px; gap: 4px; }
+  .menu-center { flex: 1; }
+  .doc-title { font-size: 13px; padding: 2px 4px; }
+  .zoom-control { padding: 2px 4px; }
+  #zoom-label { min-width: 26px; font-size: 11px; }
+  .menu-left { flex: 0 0 auto; gap: 4px; }
+  .menu-right { flex: 0 0 auto; gap: 4px; }
+
+  /* ── ARAÇ ÇUBUĞU → alt yatay bar ── */
+  #tool-sidebar {
+    top: auto;
+    bottom: 0; left: 0; right: 0;
+    width: 100%; height: 56px;
+    flex-direction: row;
+    justify-content: center; align-items: center;
+    overflow-x: auto; overflow-y: hidden;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    padding: 4px 8px; gap: 2px;
+    z-index: 95;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tool-btn {
+    width: 46px; height: 46px; min-width: 46px;
+    flex-direction: column; padding: 4px 2px;
+    flex-shrink: 0;
+  }
+  .tool-icon { font-size: 20px; }
+  .tool-label { display: none; }
+  .tool-divider { width: 1px; height: 28px; margin: 0 4px; }
+
+  /* ── SAYFALAR PANELİ → soldan kayar ── */
+  #pages-panel {
+    left: 0;
+    top: var(--menubar-h);
+    bottom: 56px;
+    width: 210px;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    z-index: 200;
+    box-shadow: var(--shadow-lg);
+  }
+  #pages-panel.mobile-open { transform: translateX(0); }
+
+  /* ── ÖZELLİKLER PANELİ → alttan kayar ── */
+  #properties-panel {
+    top: auto; left: 0; right: 0;
+    bottom: 56px; width: 100%;
+    max-height: 58vh;
+    transform: translateY(108%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    z-index: 200;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.45);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Çekme kolu */
+  #properties-panel::before {
+    content: '';
+    display: block;
+    width: 38px; height: 4px;
+    background: var(--text-muted);
+    border-radius: 999px;
+    margin: 10px auto 2px;
+    opacity: 0.5;
+  }
+  #properties-panel.mobile-open { transform: translateY(0); }
+
+  /* Panel header'daki kapat düğmesi */
+  #btn-close-props { display: flex !important; }
+
+  /* ── CANVAS ALANI → tam ekran ── */
+  #canvas-area { left: 0; right: 0; bottom: 56px; }
+  #canvas-wrapper { padding: 16px; }
+
+  /* Dropdown'lar mobilde tam genişlik */
+  .dropdown-content {
+    position: fixed !important;
+    top: var(--menubar-h) !important;
+    left: 8px !important; right: 8px !important;
+    min-width: unset !important;
+    max-height: calc(100vh - var(--menubar-h) - 16px);
+    overflow-y: auto;
+  }
+}
+
+/* Çok küçük ekranlar */
+@media (max-width: 400px) {
+  .doc-title { max-width: 80px; font-size: 12px; }
+  #btn-zoom-in, #btn-zoom-out { display: none; }
+  #zoom-label { display: none; }
+}

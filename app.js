@@ -137,6 +137,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupContextMenu();
   setupImageUpload();
   setupFileLoad();
+  setupMobilePanels();
 });
 
 // ─── PAGE MANAGEMENT ─────────────────────────────────
@@ -422,6 +423,18 @@ function selectElement(el, addToSelection = false) {
   }
 
   refreshPropertiesForSelection();
+
+  // Mobil: element seçilince özellikler panelini otomatik aç
+  if (window.innerWidth <= 768 && App.selectedElements.length > 0) {
+    document.getElementById('properties-panel').classList.add('mobile-open');
+    document.getElementById('btn-mobile-props')?.classList.add('active');
+    // Sayfalar paneli açıksa kapat
+    if (document.getElementById('pages-panel').classList.contains('mobile-open')) {
+      document.getElementById('pages-panel').classList.remove('mobile-open');
+      document.getElementById('btn-mobile-pages')?.classList.remove('active');
+      document.getElementById('mobile-overlay').classList.remove('active');
+    }
+  }
 }
 
 function deselectAll() {
@@ -429,6 +442,11 @@ function deselectAll() {
   App.selectedElement  = null;
   App.selectedElements = [];
   updatePropertiesPanel(null);
+  // Mobil: seçim kalmayınca özellikler panelini kapat
+  if (window.innerWidth <= 768) {
+    document.getElementById('properties-panel')?.classList.remove('mobile-open');
+    document.getElementById('btn-mobile-props')?.classList.remove('active');
+  }
 }
 
 // Seçim durumuna göre özellikler panelini güncelle
@@ -851,6 +869,68 @@ document.addEventListener('click', e => {
   }
 });
 
+// ─── MOBİL PANEL YÖNETİMİ ────────────────────────────
+function closeAllMobilePanels() {
+  document.getElementById('pages-panel').classList.remove('mobile-open');
+  document.getElementById('properties-panel').classList.remove('mobile-open');
+  document.getElementById('mobile-overlay').classList.remove('active');
+  document.getElementById('mobile-menu-panel')?.classList.remove('open');
+  document.getElementById('btn-mobile-pages')?.classList.remove('active');
+  document.getElementById('btn-mobile-props')?.classList.remove('active');
+  document.getElementById('btn-mobile-menu')?.classList.remove('active');
+}
+
+function setupMobilePanels() {
+  const overlay    = document.getElementById('mobile-overlay');
+  const pagesPanel = document.getElementById('pages-panel');
+  const propsPanel = document.getElementById('properties-panel');
+  const menuPanel  = document.getElementById('mobile-menu-panel');
+
+  // Hamburger menü
+  document.getElementById('btn-mobile-menu').addEventListener('click', () => {
+    const isOpen = menuPanel.classList.toggle('open');
+    overlay.classList.toggle('active', isOpen);
+    document.getElementById('btn-mobile-menu').classList.toggle('active', isOpen);
+    if (isOpen) {
+      pagesPanel.classList.remove('mobile-open');
+      document.getElementById('btn-mobile-pages').classList.remove('active');
+    }
+  });
+
+  // Sayfalar paneli toggle
+  document.getElementById('btn-mobile-pages').addEventListener('click', () => {
+    const isOpen = pagesPanel.classList.toggle('mobile-open');
+    overlay.classList.toggle('active', isOpen);
+    document.getElementById('btn-mobile-pages').classList.toggle('active', isOpen);
+    if (isOpen) {
+      menuPanel.classList.remove('open');
+      document.getElementById('btn-mobile-menu').classList.remove('active');
+    }
+  });
+
+  // Özellikler paneli toggle
+  document.getElementById('btn-mobile-props').addEventListener('click', () => {
+    const isOpen = propsPanel.classList.toggle('mobile-open');
+    document.getElementById('btn-mobile-props').classList.toggle('active', isOpen);
+    // Özellikler paneli overlay kullanmaz — canvas erişilebilir kalır
+  });
+
+  // Özellikler paneli kapat düğmesi
+  document.getElementById('btn-close-props').addEventListener('click', () => {
+    propsPanel.classList.remove('mobile-open');
+    document.getElementById('btn-mobile-props').classList.remove('active');
+  });
+
+  // Overlay tıklandığında hamburger ve sayfalar panelini kapat
+  overlay.addEventListener('click', () => {
+    pagesPanel.classList.remove('mobile-open');
+    menuPanel.classList.remove('open');
+    overlay.classList.remove('active');
+    document.getElementById('btn-mobile-pages').classList.remove('active');
+    document.getElementById('btn-mobile-menu').classList.remove('active');
+  });
+}
+
 // ─── SAVE / LOAD ──────────────────────────────────────
 function saveToStorage() {
   const docTitle = document.getElementById('doc-title-display')?.textContent.trim() || 'Dergi';
@@ -990,4 +1070,5 @@ window.sendBackward     = sendBackward;
 window.pushHistory      = pushHistory;
 window.deselectAll      = deselectAll;
 window.selectElement    = selectElement;
-window.saveToStorage    = saveToStorage;
+window.saveToStorage       = saveToStorage;
+window.closeAllMobilePanels = closeAllMobilePanels;
