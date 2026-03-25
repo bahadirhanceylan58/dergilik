@@ -115,9 +115,12 @@ window.exportA3Booklet = async function() {
   showLoading(`A3 Kitapçık PDF oluşturuluyor… (${sheetCount} tabaka)`);
 
   // We'll render each page as an image first
-  const savedPageIdx  = App.currentPageIndex;
+  const savedPageIdx = App.currentPageIndex;
   const A4_W_MM = 210, A4_H_MM = 297;
-  const A4_FMT = PAGE_FORMATS['A4'];
+  // Sayfaları GERÇEK formatlarında yakala (A4 veya A3).
+  // A4 ve A3 aynı en-boy oranına sahiptir (1:√2), jsPDF
+  // her iki durumda da 210×297mm'ye doğru ölçekler.
+  const CAPTURE_FMT = PAGE_FORMATS[App.format];
 
   // Capture all pages as images
   const pageImages = [null]; // index 0 unused (1-based), null = blank
@@ -127,7 +130,7 @@ window.exportA3Booklet = async function() {
       switchPage(i);
       await sleep(100);
       const canvasEl = document.getElementById('page-canvas');
-      const imgData = await capturePageCanvas(canvasEl, A4_FMT);
+      const imgData = await capturePageCanvas(canvasEl, CAPTURE_FMT);
       pageImages.push(imgData);
     }
 
