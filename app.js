@@ -129,6 +129,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   applyZoom();
+  fitZoomToMobile(); // mobilde sayfayı ekrana sığdır
   renderThumbnails();
 
   setupCanvasListeners();
@@ -192,6 +193,7 @@ window.setPageFormat = function(fmt) {
   App.format = fmt;
   formatBadge.textContent = fmt;
   updateCanvasSize();
+  fitZoomToMobile();
   showToast(`Format: ${PAGE_FORMATS[fmt].label}`, 'info');
 };
 
@@ -214,6 +216,16 @@ function applyZoom() {
   });
 }
 
+// Mobilde sayfayı ekran genişliğine otomatik sığdır
+function fitZoomToMobile() {
+  if (window.innerWidth > 768) return;
+  const padding     = 32; // canvas-wrapper padding (16px × 2)
+  const available   = window.innerWidth - padding;
+  const fmt         = PAGE_FORMATS[App.format];
+  App.zoom = parseFloat(Math.max(0.15, Math.min(available / fmt.w, 1.0)).toFixed(2));
+  applyZoom();
+}
+
 document.getElementById('btn-zoom-in').addEventListener('click', () => {
   App.zoom = Math.min(App.zoom + 0.1, 3);
   applyZoom();
@@ -222,6 +234,9 @@ document.getElementById('btn-zoom-out').addEventListener('click', () => {
   App.zoom = Math.max(App.zoom - 0.1, 0.2);
   applyZoom();
 });
+
+// Ekran döndürme / resize → tekrar fit
+window.addEventListener('resize', () => fitZoomToMobile());
 
 // ─── MENUBAR ──────────────────────────────────────────
 function setupMenubar() {

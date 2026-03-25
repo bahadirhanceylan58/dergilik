@@ -609,7 +609,18 @@ html, body {
 
   /* ── CANVAS ALANI → tam ekran ── */
   #canvas-area { left: 0; right: 0; bottom: 56px; }
-  #canvas-wrapper { padding: 16px; }
+  #canvas-wrapper {
+    padding: 16px;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: unset;
+    min-height: unset;
+  }
+  #canvas-area {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+  }
 
   /* Dropdown'lar mobilde tam genişlik */
   .dropdown-content {
