@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dergi Stüdyosu — Profesyonel Dergi Tasarımı</title>
+  <meta name="description" content="A4 ve A3 formatında profesyonel dergi tasarımı ve PDF dışa aktarma aracı."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet"/>
+  <!-- Pickr Color Picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <!-- SPLASH SCREEN -->
+  <div id="splash-screen">
+    <div class="splash-logo">
+      <div class="splash-icon">📰</div>
+      <h1>Dergi <span>Stüdyosu</span></h1>
+      <p>Profesyonel Dergi Tasarımı</p>
+      <div class="splash-bar"><div class="splash-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- TOP MENUBAR -->
+  <header id="menubar">
+    <div class="menu-left">
+      <div class="app-logo">
+        <span class="logo-icon">📰</span>
+        <span class="logo-text">Dergi <strong>Stüdyosu</strong></span>
+      </div>
+      <nav class="menu-nav">
+        <button class="menu-btn" id="btn-new-doc">Yeni</button>
+        <div class="menu-dropdown" id="dd-file">
+          <button class="menu-btn" onclick="toggleDropdown('dd-file')">Dosya ▾</button>
+          <div class="dropdown-content">
+            <button onclick="saveToStorage(); showToast('💾 Kaydedildi.', 'success')">💾 Kaydet (Ctrl+S)</button>
+            <button onclick="saveToFile()">📥 JSON Olarak İndir</button>
+            <button onclick="document.getElementById('json-upload').click()">📂 JSON Yükle</button>
+          </div>
+        </div>
+        <div class="menu-dropdown" id="dd-export">
+          <button class="menu-btn" onclick="toggleDropdown('dd-export')">Dışa Aktar ▾</button>
+          <div class="dropdown-content">
+            <button onclick="exportA4PDF()">📄 A4 PDF (Tek Sayfalar)</button>
+            <button onclick="exportA3Booklet()">🖨️ A3 Kitapçık (Baskı Dizgisi)</button>
+            <button onclick="exportA3SinglePages()">📋 A3 PDF (Tek Sayfalar)</button>
+          </div>
+        </div>
+        <div class="menu-dropdown" id="dd-templates">
+          <button class="menu-btn" onclick="toggleDropdown('dd-templates')">Şablonlar ▾</button>
+          <div class="dropdown-content">
+            <button onclick="loadTemplate('cover')">📕 Kapak Şablonu (Modern)</button>
+            <button onclick="loadTemplate('article')">📰 İçerik Şablonu (2 Sütun)</button>
+            <button onclick="loadTemplate('photo')">📸 Fotoğraf Portfolyo</button>
+          </div>
+        </div>
+        <div class="menu-dropdown" id="dd-format">
+          <button class="menu-btn" onclick="toggleDropdown('dd-format')">Format ▾</button>
+          <div class="dropdown-content">
+            <button onclick="setPageFormat('A4')">📄 A4 (210×297mm)</button>
+            <button onclick="setPageFormat('A3')">📋 A3 (297×420mm)</button>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="menu-center">
+      <span id="doc-title-display" class="doc-title" contenteditable="true" spellcheck="false">Yeni Dergi</span>
+    </div>
+    <div class="menu-right">
+      <span id="format-badge" class="format-badge">A3</span>
+      <div class="zoom-control">
+        <button id="btn-zoom-out" title="Uzaklaştır">−</button>
+        <span id="zoom-label">100%</span>
+        <button id="btn-zoom-in" title="Yakınlaştır">+</button>
+      </div>
+      <button id="btn-grid" class="icon-btn" title="Kılavuz Izgarası">⬛</button>
+      <button id="btn-undo" class="icon-btn" title="Geri Al (Ctrl+Z)">↩</button>
+      <button id="btn-redo" class="icon-btn" title="Yinele (Ctrl+Y)">↪</button>
+    </div>
+  </header>
+
+  <!-- TOOL SIDEBAR LEFT -->
+  <aside id="tool-sidebar">
+    <button class="tool-btn active" id="tool-select" data-tool="select" title="Seç (V)">
+      <span class="tool-icon">↖</span><span class="tool-label">Seç</span>
+    </button>
+    <button class="tool-btn" id="tool-text" data-tool="text" title="Metin (T)">
+      <span class="tool-icon">T</span><span class="tool-label">Metin</span>
+    </button>
+    <button class="tool-btn" id="tool-image" data-tool="image" title="Görsel (I)">
+      <span class="tool-icon">🖼</span><span class="tool-label">Görsel</span>
+    </button>
+    <div class="tool-divider"></div>
+    <button class="tool-btn" id="tool-rect" data-tool="rect" title="Dikdörtgen (R)">
+      <span class="tool-icon">▬</span><span class="tool-label">Dikd.</span>
+    </button>
+    <button class="tool-btn" id="tool-circle" data-tool="circle" title="Daire (C)">
+      <span class="tool-icon">●</span><span class="tool-label">Daire</span>
+    </button>
+    <button class="tool-btn" id="tool-line" data-tool="line" title="Çizgi (L)">
+      <span class="tool-icon">╱</span><span class="tool-label">Çizgi</span>
+    </button>
+    <div class="tool-divider"></div>
+    <button class="tool-btn" id="tool-column" data-tool="column" title="Sütun (U)">
+      <span class="tool-icon">⫷</span><span class="tool-label">Sütun</span>
+    </button>
+  </aside>
+
+  <!-- PAGE THUMBNAILS LEFT PANEL -->
+  <aside id="pages-panel">
+    <div class="panel-header">
+      <span>Sayfalar</span>
+      <button id="btn-add-page" title="Sayfa Ekle">+</button>
+    </div>
+    <div id="page-thumbnails"></div>
+  </aside>
+
+  <!-- MAIN CANVAS AREA -->
+  <main id="canvas-area">
+    <div id="canvas-wrapper">
+      <div id="page-canvas">
+        <!-- Elements rendered here dynamically -->
+        <div id="grid-overlay"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PROPERTIES PANEL RIGHT -->
+  <aside id="properties-panel">
+    <div class="panel-header">Özellikler</div>
+
+    <!-- Select / Position -->
+    <div class="prop-section" id="prop-position">
+      <div class="prop-title">Konum & Boyut</div>
+      <div class="prop-row">
+        <label>X</label><input type="number" id="prop-x" class="prop-input"/><span class="prop-unit">px</span>
+      </div>
+      <div class="prop-row">
+        <label>Y</label><input type="number" id="prop-y" class="prop-input"/><span class="prop-unit">px</span>
+      </div>
+      <div class="prop-row">
+        <label>G</label><input type="number" id="prop-w" class="prop-input"/><span class="prop-unit">px</span>
+      </div>
+      <div class="prop-row">
+        <label>Yük</label><input type="number" id="prop-h" class="prop-input"/><span class="prop-unit">px</span>
+      </div>
+      <div class="prop-row">
+        <label>Döndür</label><input type="number" id="prop-rot" class="prop-input" value="0"/><span class="prop-unit">°</span>
+      </div>
+    </div>
+
+    <!-- Text Properties -->
+    <div class="prop-section" id="prop-text" style="display:none">
+      <div class="prop-title">Metin</div>
+      <div class="prop-row">
+        <label>Font</label>
+        <select id="prop-font" class="prop-select">
+          <option value="Inter">Inter</option>
+          <option value="Playfair Display">Playfair Display</option>
+          <option value="Roboto Condensed">Roboto Condensed</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Arial">Arial</option>
+          <option value="Helvetica">Helvetica</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Impact">Impact</option>
+        </select>
+      </div>
+      <div class="prop-row">
+        <label>Boyut</label>
+        <input type="number" id="prop-font-size" class="prop-input" value="16"/>
+        <span class="prop-unit">pt</span>
+      </div>
+      <div class="prop-row">
+        <label>Satır</label>
+        <input type="number" id="prop-line-height" class="prop-input" value="1.4" step="0.1"/>
+        <span class="prop-unit">×</span>
+      </div>
+      <div class="prop-row">
+        <label>Renk</label>
+        <div id="text-color-picker" class="color-swatch"></div>
+        <input type="text" id="prop-text-color" class="prop-input color-hex" value="#1a1a1a"/>
+      </div>
+      <div class="prop-row style-row">
+        <button id="prop-bold" class="style-btn" title="Kalın"><b>B</b></button>
+        <button id="prop-italic" class="style-btn" title="İtalik"><i>I</i></button>
+        <button id="prop-underline" class="style-btn" title="Altı Çizili"><u>U</u></button>
+      </div>
+      <div class="prop-row style-row">
+        <button id="align-left" class="style-btn" title="Sola Hizala">⬛◻◻</button>
+        <button id="align-center" class="style-btn" title="Ortala">◻⬛◻</button>
+        <button id="align-right" class="style-btn" title="Sağa Hizala">◻◻⬛</button>
+        <button id="align-justify" class="style-btn" title="İki Yana Yasla">≡</button>
+      </div>
+    </div>
+
+    <!-- Shape Properties -->
+    <div class="prop-section" id="prop-shape" style="display:none">
+      <div class="prop-title">Şekil</div>
+      <div class="prop-row">
+        <label>Dolgu</label>
+        <div id="fill-color-picker" class="color-swatch"></div>
+        <input type="text" id="prop-fill" class="prop-input color-hex" value="#4f46e5"/>
+      </div>
+      <div class="prop-row">
+        <label>Kenarlık</label>
+        <div id="stroke-color-picker" class="color-swatch"></div>
+        <input type="text" id="prop-stroke" class="prop-input color-hex" value="transparent"/>
+      </div>
+      <div class="prop-row">
+        <label>Kalınlık</label>
+        <input type="number" id="prop-stroke-width" class="prop-input" value="0" min="0" max="20"/>
+        <span class="prop-unit">px</span>
+      </div>
+      <div class="prop-row">
+        <label>Yarıçap</label>
+        <input type="number" id="prop-border-radius" class="prop-input" value="0" min="0"/>
+        <span class="prop-unit">px</span>
+      </div>
+      <div class="prop-row">
+        <label>Opaklık</label>
+        <input type="range" id="prop-opacity" min="0" max="100" value="100" class="prop-slider"/>
+        <span id="prop-opacity-label">100%</span>
+      </div>
+    </div>
+
+    <!-- Layer Controls -->
+    <div class="prop-section" id="prop-layers">
+      <div class="prop-title">Katmanlar</div>
+      <div class="layer-btns">
+        <button id="btn-front" class="layer-btn" title="Öne Getir">⬆ Öne</button>
+        <button id="btn-back" class="layer-btn" title="Arkaya Gönder">⬇ Arkaya</button>
+        <button id="btn-forward" class="layer-btn" title="Bir Üste">↑ Üste</button>
+        <button id="btn-backward" class="layer-btn" title="Bir Alta">↓ Alta</button>
+      </div>
+    </div>
+
+    <!-- Element Actions -->
+    <div class="prop-section" id="prop-actions">
+      <div class="prop-title">İşlemler</div>
+      <div class="layer-btns">
+        <button id="btn-duplicate-el" class="action-btn">⧉ Kopyala</button>
+        <button id="btn-delete-el" class="action-btn danger">🗑 Sil</button>
+      </div>
+    </div>
+
+    <!-- Page Actions Section -->
+    <div class="prop-section" id="prop-page">
+      <div class="prop-title">Sayfa</div>
+      <div class="prop-row">
+        <label>Arka Plan</label>
+        <div id="page-bg-picker" class="color-swatch"></div>
+        <input type="text" id="prop-page-bg" class="prop-input color-hex" value="#ffffff"/>
+      </div>
+      <div class="layer-btns" style="margin-top:8px">
+        <button id="btn-dup-page" class="action-btn">⧉ Sayfayı Kopyala</button>
+        <button id="btn-del-page" class="action-btn danger">🗑 Sayfayı Sil</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTEXT MENU -->
+  <div id="context-menu" style="display:none">
+    <div class="ctx-item" id="ctx-duplicate">⧉ Kopyala</div>
+    <div class="ctx-item" id="ctx-front">⬆ Öne Getir</div>
+    <div class="ctx-item" id="ctx-back">⬇ Arkaya Gönder</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item danger" id="ctx-delete">🗑 Sil</div>
+  </div>
+
+  <!-- IMAGE UPLOAD (hidden) -->
+  <input type="file" id="image-upload" accept="image/*" style="display:none"/>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" style="display:none">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p id="loading-text">PDF oluşturuluyor…</p>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.27/interact.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+  <script src="app.js"></script>
+  <script src="toolbar.js"></script>
+  <script src="pdf-export.js"></script>
+</body>
+</html>
