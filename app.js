@@ -219,11 +219,25 @@ function applyZoom() {
 // Mobilde sayfayı ekran genişliğine otomatik sığdır
 function fitZoomToMobile() {
   if (window.innerWidth > 768) return;
-  const padding     = 32; // canvas-wrapper padding (16px × 2)
-  const available   = window.innerWidth - padding;
-  const fmt         = PAGE_FORMATS[App.format];
+  const padding   = 32; // canvas-wrapper padding (16px × 2)
+  const available = window.innerWidth - padding;
+  const fmt       = PAGE_FORMATS[App.format];
   App.zoom = parseFloat(Math.max(0.15, Math.min(available / fmt.w, 1.0)).toFixed(2));
   applyZoom();
+}
+
+// Mobil özellikler paneli aç
+function openMobileProps() {
+  if (window.innerWidth > 768) return;
+  document.getElementById('properties-panel').classList.add('mobile-open');
+  document.getElementById('btn-mobile-props')?.classList.add('active');
+}
+
+// Mobil özellikler paneli kapat
+function closeMobileProps() {
+  if (window.innerWidth > 768) return;
+  document.getElementById('properties-panel').classList.remove('mobile-open');
+  document.getElementById('btn-mobile-props')?.classList.remove('active');
 }
 
 document.getElementById('btn-zoom-in').addEventListener('click', () => {
@@ -441,9 +455,7 @@ function selectElement(el, addToSelection = false) {
 
   // Mobil: element seçilince özellikler panelini otomatik aç
   if (window.innerWidth <= 768 && App.selectedElements.length > 0) {
-    document.getElementById('properties-panel').classList.add('mobile-open');
-    document.getElementById('btn-mobile-props')?.classList.add('active');
-    // Sayfalar paneli açıksa kapat
+    openMobileProps();
     if (document.getElementById('pages-panel').classList.contains('mobile-open')) {
       document.getElementById('pages-panel').classList.remove('mobile-open');
       document.getElementById('btn-mobile-pages')?.classList.remove('active');
@@ -457,11 +469,7 @@ function deselectAll() {
   App.selectedElement  = null;
   App.selectedElements = [];
   updatePropertiesPanel(null);
-  // Mobil: seçim kalmayınca özellikler panelini kapat
-  if (window.innerWidth <= 768) {
-    document.getElementById('properties-panel')?.classList.remove('mobile-open');
-    document.getElementById('btn-mobile-props')?.classList.remove('active');
-  }
+  closeMobileProps(); // mobil: seçim kalmayınca paneli kapat
 }
 
 // Seçim durumuna göre özellikler panelini güncelle
@@ -931,9 +939,17 @@ function setupMobilePanels() {
   });
 
   // Özellikler paneli kapat düğmesi
-  document.getElementById('btn-close-props').addEventListener('click', () => {
+  document.getElementById('btn-close-props').addEventListener('click', (e) => {
+    e.stopPropagation();
     propsPanel.classList.remove('mobile-open');
     document.getElementById('btn-mobile-props').classList.remove('active');
+  });
+
+  // Panel başlığına dokunarak aç/kapat (mobil kolaylık)
+  propsPanel.querySelector('.panel-header').addEventListener('click', () => {
+    if (window.innerWidth > 768) return;
+    const isOpen = propsPanel.classList.toggle('mobile-open');
+    document.getElementById('btn-mobile-props').classList.toggle('active', isOpen);
   });
 
   // Overlay tıklandığında hamburger ve sayfalar panelini kapat

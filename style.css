@@ -545,30 +545,40 @@ html, body {
   #tool-sidebar {
     top: auto;
     bottom: 0; left: 0; right: 0;
-    width: 100%; height: 56px;
+    width: 100%; height: 68px;  /* Adobe Express gibi büyük bar */
     flex-direction: row;
     justify-content: center; align-items: center;
     overflow-x: auto; overflow-y: hidden;
     border-right: none;
     border-top: 1px solid var(--border);
-    padding: 4px 8px; gap: 2px;
+    padding: 0 4px; gap: 0;
     z-index: 95;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Adobe Express stili büyük araç butonları */
   .tool-btn {
-    width: 46px; height: 46px; min-width: 46px;
-    flex-direction: column; padding: 4px 2px;
-    flex-shrink: 0;
+    width: 54px; height: 64px; min-width: 54px;
+    flex-direction: column; padding: 6px 4px 4px;
+    flex-shrink: 0; gap: 3px;
+    border-radius: 10px;
   }
-  .tool-icon { font-size: 20px; }
-  .tool-label { display: none; }
-  .tool-divider { width: 1px; height: 28px; margin: 0 4px; }
+  .tool-btn.active {
+    background: var(--bg-active);
+  }
+  .tool-icon { font-size: 22px; line-height: 1.1; }
+  .tool-label {
+    display: block !important;
+    font-size: 9px; letter-spacing: 0;
+    color: inherit; white-space: nowrap;
+  }
+  .tool-divider { width: 1px; height: 36px; margin: 0 2px; flex-shrink: 0; }
 
   /* ── SAYFALAR PANELİ → soldan kayar ── */
   #pages-panel {
     left: 0;
     top: var(--menubar-h);
-    bottom: 56px;
+    bottom: 68px;
     width: 210px;
     transform: translateX(-100%);
     transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
@@ -577,18 +587,20 @@ html, body {
   }
   #pages-panel.mobile-open { transform: translateX(0); }
 
-  /* ── ÖZELLİKLER PANELİ → alttan kayar ── */
+  /* ── ÖZELLİKLER PANELİ → bottom konumlandırma (transform güvenilmez) ── */
   #properties-panel {
+    position: fixed;
     top: auto; left: 0; right: 0;
-    bottom: 56px; width: 100%;
-    max-height: 58vh;
-    transform: translateY(108%);
-    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    width: 100%; height: 62vh;
+    max-height: 62vh;
+    bottom: calc(-62vh - 20px); /* tamamen ekran dışı */
+    transform: none;
+    transition: bottom 0.32s cubic-bezier(0.4,0,0.2,1);
     z-index: 200;
     border-left: none;
     border-top: 1px solid var(--border);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.45);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -596,30 +608,40 @@ html, body {
   #properties-panel::before {
     content: '';
     display: block;
-    width: 38px; height: 4px;
+    width: 40px; height: 5px;
     background: var(--text-muted);
     border-radius: 999px;
-    margin: 10px auto 2px;
+    margin: 12px auto 4px;
     opacity: 0.5;
   }
-  #properties-panel.mobile-open { transform: translateY(0); }
+  #properties-panel.mobile-open {
+    bottom: 68px; /* alt araç çubuğunun üstüne otur */
+  }
 
-  /* Panel header'daki kapat düğmesi */
+  /* Panel başlığına dokunarak aç/kapat — büyük dokunma alanı */
+  #properties-panel .panel-header {
+    cursor: pointer;
+    padding: 8px 14px 10px;
+    font-size: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Kapat düğmesi */
   #btn-close-props { display: flex !important; }
 
   /* ── CANVAS ALANI → tam ekran ── */
-  #canvas-area { left: 0; right: 0; bottom: 56px; }
+  #canvas-area {
+    left: 0; right: 0; bottom: 68px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+  }
   #canvas-wrapper {
     padding: 16px;
     align-items: flex-start;
     justify-content: center;
-    min-width: unset;
-    min-height: unset;
-  }
-  #canvas-area {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    align-items: flex-start;
+    min-width: unset; min-height: unset;
   }
 
   /* Dropdown'lar mobilde tam genişlik */
@@ -638,4 +660,5 @@ html, body {
   .doc-title { max-width: 80px; font-size: 12px; }
   #btn-zoom-in, #btn-zoom-out { display: none; }
   #zoom-label { display: none; }
+  .tool-btn { width: 48px; min-width: 48px; }
 }
